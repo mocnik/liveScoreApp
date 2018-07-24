@@ -1,5 +1,5 @@
 import firebirdsql
-
+import numbers
 
 STR_ESCAPE = "'"
 STATUS_CODES = {
@@ -42,6 +42,11 @@ def get_category_runners(conn, category_id):
     return [to_runner_data(row) for row in table]
 
 
+def get_runner_by_start_number(conn, start_number):
+    table = get_table(conn, 'OEVLISTSVIEW', {'STARTNUMBER': start_number})
+    return [to_runner_data(row) for row in table]
+
+
 def to_runner_data(table_row):
     d = {'startNumber': table_row['STARTNUMBER'],
          'name': table_row['FIRSTNAME'] + ' ' + table_row['LASTNAME'],
@@ -54,7 +59,4 @@ def to_runner_data(table_row):
     if table_row['COMPETITIONTIME1']:
         d['competitionTime'] = table_row['COMPETITIONTIME1'] / 100
 
-
-
     return d
-

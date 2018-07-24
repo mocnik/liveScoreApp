@@ -1,7 +1,7 @@
 from flask import Flask, g, request, jsonify
 from flask_socketio import SocketIO
 
-from db import connect_db, get_categories, get_category_runners
+from db import connect_db, get_categories, get_category_runners, get_runner_by_start_number
 
 
 app = Flask(__name__)
@@ -25,6 +25,11 @@ def punch():
 @app.route('/categories', methods=['GET'])
 def list_categories():
     return jsonify(get_categories(get_db()))
+
+
+@app.route('/runners/<start_number>', methods=['GET'])
+def list_runner(start_number):
+    return jsonify(get_runner_by_start_number(get_db(), start_number))
 
 
 @app.route('/category/<category_id>/runners', methods=['GET'])
