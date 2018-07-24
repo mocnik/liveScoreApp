@@ -34,5 +34,5 @@ DB_CONNECTION_STRING='localhost:C:\\Users\\<user>\\AppData\\Roaming\\OEvent\\Dat
 ## Available endpoints
 * http://localhost:8000/competition
 * http://localhost:8000/categories
-* http://localhost:8000/category/<category>/runners
-* http://localhost:8000/runner/<start_number>
+* http://localhost:8000/category/CATEGORY/runners
+* http://localhost:8000/runner/START_NUMBER
