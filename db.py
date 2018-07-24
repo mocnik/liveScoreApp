@@ -2,6 +2,14 @@ import firebirdsql
 
 
 STR_ESCAPE = "'"
+STATUS_CODES = {
+    0: 'Active',
+    1: 'OK',
+    2: 'DISQ',
+    3: 'DNF',
+    4: 'DNS',
+    5: 'MP'
+}
 
 
 def connect_db(dsn, username, password):
@@ -37,10 +45,16 @@ def get_category_runners(conn, category_id):
 def to_runner_data(table_row):
     d = {'startNumber': table_row['STARTNUMBER'],
          'name': table_row['FIRSTNAME'] + ' ' + table_row['LASTNAME'],
-         'siCardNumber': table_row['CHIPNUMBER1']}
+         'siCardNumber': table_row['CHIPNUMBER1'],
+         'finishType': STATUS_CODES[table_row['FINISHTYPE1']],
+         'club': table_row['CLUBLONGNAME'],
+         'country': table_row['COUNTRYSHORTNAME']}
     if table_row['STARTTIME1']:
         d['startTime'] = table_row['STARTTIME1'] / 100
     if table_row['COMPETITIONTIME1']:
         d['competitionTime'] = table_row['COMPETITIONTIME1'] / 100
 
+
+
     return d
+
