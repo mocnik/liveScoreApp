@@ -1,7 +1,7 @@
 from flask import Flask, g, request, jsonify
 from flask_socketio import SocketIO
 
-from db import connect_db, get_categories, get_category_runners, get_runner_by_start_number
+from db import connect_db, get_categories, get_category_runners, get_runner_by_start_number, get_competition_data
 
 
 app = Flask(__name__)
@@ -35,6 +35,11 @@ def list_runner(start_number):
 @app.route('/category/<category_id>/runners', methods=['GET'])
 def list_category_runners(category_id):
     return jsonify(get_category_runners(get_db(), category_id))
+
+
+@app.route('/competition', methods=['GET'])
+def list_competition_date():
+    return jsonify(get_competition_data(get_db()))
 
 
 def get_db():

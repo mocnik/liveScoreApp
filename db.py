@@ -60,3 +60,13 @@ def to_runner_data(table_row):
         d['competitionTime'] = table_row['COMPETITIONTIME1'] / 100
 
     return d
+
+
+def get_competition_data(conn):
+    table = get_table(conn, 'OEVCOMPETITION')[0]
+    d = {'name': table['COMPETITIONNAME'],
+         'place': table['COMPETITIONPLACE'],
+         'organizer': table['ORGANIZER'],
+         'date': table['DATE1'],
+         'firstStart': table['FIRSTSTART1']}
+    return d
