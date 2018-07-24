@@ -30,7 +30,11 @@ var punchList = document.getElementById('punch-list');
 var socket = io.connect('http://127.0.0.1:8000');
 socket.on('new_punch', function(data) {
   console.log(data);
-  punchList.innerHTML = punchList.innerHTML + '<li class="collection-item">'+data.stationCode+' - '+data.chipNumber+' - '+data.time+'</li>';
+  if (data.runner !== undefined) {
+    punchList.innerHTML = punchList.innerHTML + '<li class="collection-item">'+data.stationCode+' - '+data.runner.name+' - '+data.time+'</li>';
+  } else {
+    punchList.innerHTML = punchList.innerHTML + '<li class="collection-item">'+data.stationCode+' - '+data.chipNumber+' - '+data.time+'</li>';
+  }
 });
 </script>
     </div>

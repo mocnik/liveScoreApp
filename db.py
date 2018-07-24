@@ -1,5 +1,4 @@
 import firebirdsql
-import numbers
 
 STR_ESCAPE = "'"
 STATUS_CODES = {
@@ -46,6 +45,10 @@ def get_runner_by_start_number(conn, start_number):
     table = get_table(conn, 'OEVLISTSVIEW', {'STARTNUMBER': start_number})
     return [to_runner_data(row) for row in table]
 
+
+def get_runner_by_chip_number(conn, chip_number):
+    table = get_table(conn, 'OEVLISTSVIEW', {'CHIPNUMBER1': chip_number})
+    return [to_runner_data(row) for row in table]
 
 def to_runner_data(table_row):
     d = {'startNumber': table_row['STARTNUMBER'],
