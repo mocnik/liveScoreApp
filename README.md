@@ -22,14 +22,21 @@ Body={"chipNumber": %ChipNr%, "time": "%PunchTime%", "stationCode": %CodeNr%}
 * Required software can be downloaded from: http://www.oevent.org/Downloads.aspx
 * Firebird database software needs to be installed as `Super Classic Server Binary`, more on this in OEvent help.
 * Based on location of served and `gdb` files put together connection string and fix it in `app.py`. Example of valid connection string:
-```
-DB_CONNECTION_STRING='localhost:C:\\Users\\<user>\\AppData\\Roaming\\OEvent\\Data\\Competition1.gdb'
-```
+    ```
+    DB_CONNECTION_STRING='localhost:C:\\Users\\<user>\\AppData\\Roaming\\OEvent\\Data\\Competition1.gdb'
+    ```
 
 ## Test
  * Start `run.bat`
  * Open `templates/index.html`
  * Open `jsh_Radio`, connect WebClient and send test punch
+ * Test punch from console:
+    ```
+    >flask punch
+    Usage: flask punch [OPTIONS] CHIP STATION
+    >flask punch 8210194 100
+    >flask punch 550297 100
+    ```
 
 ## Available endpoints
 * http://localhost:8000/competition
