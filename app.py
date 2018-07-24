@@ -1,4 +1,4 @@
-from flask import Flask, g, request, jsonify
+from flask import Flask, g, request, jsonify, abort
 from flask_socketio import SocketIO
 
 from db import connect_db, get_categories, get_category_runners, get_runner_by_start_number, get_competition_data
@@ -27,9 +27,13 @@ def list_categories():
     return jsonify(get_categories(get_db()))
 
 
-@app.route('/runners/<start_number>', methods=['GET'])
+@app.route('/runner/<start_number>', methods=['GET'])
 def list_runner(start_number):
-    return jsonify(get_runner_by_start_number(get_db(), start_number))
+    runner_data = get_runner_by_start_number(get_db(), start_number)
+    if not runner_data:
+        abort(404)
+
+    return jsonify(runner_data[0])
 
 
 @app.route('/category/<category_id>/runners', methods=['GET'])
