@@ -14,7 +14,7 @@ Change WebClient settings at the bottom of `jSh_Radio.ini` with:
 ```
 URL=http://127.0.0.1:8000/punch
 Header=Content-Type: application/json
-Body={"chipNumber": %ChipNr%, "time": "%PunchTime%", "stationCode": %CodeNr%}
+Body={"chipNumber": %ChipNr%, "time": "%PunchUnix%", "stationCode": %CodeNr%}
 ```
 
 ## OEvent
@@ -27,6 +27,7 @@ Body={"chipNumber": %ChipNr%, "time": "%PunchTime%", "stationCode": %CodeNr%}
     ```
 
 ## Test
+ * Initialize sqlite `flask init_db`
  * Start `run.bat`
  * Open `templates/index.html`
  * Open `jsh_Radio`, connect WebClient and send test punch
