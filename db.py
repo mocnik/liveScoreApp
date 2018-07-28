@@ -24,15 +24,31 @@ def get_table(conn, table, filters=None, order_by=None):
     cur = conn.cursor()
     sql = 'SELECT * FROM %s' % table
     if filters:
-        sql += ' WHERE ' + ' AND '.join(str(k) + ' = ' + STR_ESCAPE + str(v) + STR_ESCAPE for k, v in filters.items())
+        sql += ' WHERE ' + ' AND '.join(
+            str(k) + ' ' + get_operator(v) + ' ' + STR_ESCAPE + get_value(v) + STR_ESCAPE for k, v in filters.items())
     if order_by:
-        sql += ' ORDER BY ' + order_by
+        if isinstance(order_by, tuple):
+            sql += ' ORDER BY ' + ','.join(order_by)
+        else:
+            sql += ' ORDER BY ' + order_by
     cur.execute(sql)
     data = cur.fetchall()
     desc = [description[0] for description in cur.description]
     cur.close()
     print('{} {:.4f}ms'.format(sql, (timer()-start)*1000))
     return [{d: e for e, d in zip(row, desc)} for row in data]
+
+
+def get_value(v):
+    if isinstance(v, tuple):
+        return str(v[1])
+    return str(v)
+
+
+def get_operator(v):
+    if isinstance(v, tuple):
+        return str(v[0])
+    return '='
 
 
 def get_categories(conn):
