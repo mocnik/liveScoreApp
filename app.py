@@ -4,7 +4,7 @@ from requests import post
 from datetime import datetime
 
 from db import connect_db, get_categories, get_category_runners, get_runner_by_start_number, get_competition_data, \
-    get_runner_by_chip_number
+    get_runner_by_chip_number, get_category_startlist
 
 import click
 
@@ -55,6 +55,11 @@ def list_runner(start_number):
 @app.route('/category/<category_id>/runners', methods=['GET'])
 def list_category_runners(category_id):
     return jsonify(get_category_runners(get_db(), category_id))
+
+
+@app.route('/category/<category_id>/startList', methods=['GET'])
+def startlist_category(category_id):
+    return jsonify(get_category_startlist(get_db(), category_id))
 
 
 @app.route('/competition', methods=['GET'])
