@@ -1,0 +1,14 @@
+flask punch 1000555 60 -t 36790
+flask punch 1000555 0 -t 37280
+flask punch 231977 60 -t 37420
+flask punch 7777300 60 -t 37560
+flask punch 231977 0 -t 37810
+flask punch 7777300 0 -t 37980
+flask punch 7180494 60 -t 38720
+flask punch 7180494 0 -t 39150
+flask punch 2065881 60 -t 39350
+flask punch 2065881 0 -t 39810
+flask punch 7297 60 -t 39900
+flask punch 2070920 60 -t 40170
+flask punch 7297 0 -t 40300
+flask punch 2070920 0 -t 40560
