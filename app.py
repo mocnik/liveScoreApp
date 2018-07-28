@@ -2,6 +2,7 @@ from flask import Flask, g, request, jsonify, abort
 from flask_socketio import SocketIO
 from requests import post
 from datetime import datetime
+from timeit import default_timer as timer
 
 from db import connect_db, get_categories, get_category_runners, get_runner_by_start_number, get_competition_data, \
     get_runner_by_chip_number, get_category_startlist
@@ -69,9 +70,11 @@ def list_competition_date():
 
 def get_db():
     if not hasattr(g, 'firebird_db'):
+        start = timer()
         g.firebird_db = connect_db(app.config['DB_CONNECTION_STRING'],
                                    app.config['DB_USERNAME'],
                                    app.config['DB_PASSWORD'])
+        print('DB CONN {:.4f}ms'.format((timer()-start)*1000))
     return g.firebird_db
 
 

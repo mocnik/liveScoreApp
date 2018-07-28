@@ -31,7 +31,7 @@ def get_table(conn, table, filters=None, order_by=None):
     data = cur.fetchall()
     desc = [description[0] for description in cur.description]
     cur.close()
-    print('{} {:.4f}ms'.format(sql, timer()-start))
+    print('{} {:.4f}ms'.format(sql, (timer()-start)*1000))
     return [{d: e for e, d in zip(row, desc)} for row in data]
 
 
