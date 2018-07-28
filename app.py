@@ -5,7 +5,7 @@ from datetime import datetime
 from timeit import default_timer as timer
 
 from db import connect_db, get_categories, get_category_runners, get_runner_by_start_number, get_competition_data, \
-    get_runner_by_chip_number, get_category_startlist
+    get_runner_by_chip_number, get_category_startlist, get_category_official_results
 
 import click
 
@@ -61,6 +61,11 @@ def list_category_runners(category_id):
 @app.route('/category/<category_id>/startList', methods=['GET'])
 def startlist_category(category_id):
     return jsonify(get_category_startlist(get_db(), category_id))
+
+
+@app.route('/category/<category_id>/officialResults', methods=['GET'])
+def official_results_category(category_id):
+    return jsonify(get_category_official_results(get_db(), category_id))
 
 
 @app.route('/competition', methods=['GET'])

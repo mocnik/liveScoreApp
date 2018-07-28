@@ -66,6 +66,12 @@ def get_category_startlist(conn, category_id):
     return [to_runner_data(row) for row in table]
 
 
+def get_category_official_results(conn, category_id):
+    table = get_table(conn, 'OEVLISTSVIEW', {'CATEGORYNAME': category_id, 'ISRUNNING1': 1, 'FINISHTYPE1': ('>', 0)},
+                      ('FINISHTYPE1', 'COMPETITIONTIME1'))
+    return [to_runner_data(row) for row in table]
+
+
 def get_runner_by_start_number(conn, start_number):
     table = get_table(conn, 'OEVLISTSVIEW', {'STARTNUMBER': start_number})
     return [to_runner_data(row) for row in table]
