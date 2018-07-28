@@ -15,7 +15,7 @@ socketio = SocketIO(app)
 app.config.update(
     DB_USERNAME='SYSDBA',
     DB_PASSWORD='masterkey',
-    DB_CONNECTION_STRING='localhost:C:\\Users\\ASUS-Rok\\AppData\\Roaming\\OEvent\\Data\\Competition12.gdb'
+    DB_CONNECTION_STRING='127.0.0.1:C:\\Users\\ASUS-Rok\\AppData\\Roaming\\OEvent\\Data\\Competition12.gdb'
 )
 
 
