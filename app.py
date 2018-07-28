@@ -1,13 +1,14 @@
 from flask import Flask, g, request, jsonify, abort
 from flask_socketio import SocketIO
 from requests import post
-from datetime import datetime
+from time import time
 from timeit import default_timer as timer
 
 from db import connect_db, get_categories, get_category_runners, get_runner_by_start_number, get_competition_data, \
     get_runner_by_chip_number, get_category_startlist, get_category_official_results
 
 import click
+import sqlite3
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -16,27 +17,47 @@ app.config.update(
     DB_USERNAME='SYSDBA',
     DB_PASSWORD='masterkey',
     DB_CONNECTION_STRING='127.0.0.1:C:\\Users\\ASUS-Rok\\AppData\\Roaming\\OEvent\\Data\\Competition12.gdb'
+    SQLITE='punches.db'
 )
 
 
-@app.cli.command('punch')
+@app.cli.command('punch', help='Simulate punch')
 @click.argument('chip')
 @click.argument('station')
-def test_punch(chip, station):
-    data = {'chipNumber': chip, 'time': datetime.now().isoformat(), 'stationCode': station}
+@click.option('-t', default=None, help='Punch time')
+def test_punch(chip, station, t):
+    if t:
+        punch_time = int(t)
+    else:
+        punch_time = int(round(time()))
+    data = {'chipNumber': chip, 'time': punch_time, 'stationCode': station}
     post('http://127.0.0.1:8000/punch', json=data)
     click.echo(data)
+
+
+@app.cli.command('init_db', help='Initialise database')
+def init_db():
+    db = get_sqlite()
+    with app.open_resource('schema.sql', mode='r') as f:
+        db.cursor().executescript(f.read())
+    db.commit()
 
 
 @app.route('/punch', methods=['POST'])
 def punch():
     json = request.get_json()
-    # runners = get_runner_by_chip_number(get_db(), json['chipNumber'])
-    # if runners:
-    #     json['runner'] = runners[0]
     socketio.emit('new_punch', json)
+    sql = '''INSERT INTO punches(chipNumber, stationCode, time) VALUES (?,?,?)'''
+    conn = get_sqlite()
+    cur = conn.cursor()
+    cur.execute(sql, (json['chipNumber'], json['stationCode'], json['time']))
+    conn.commit()
     print(json)
     return '', 200
+
+
+def calc_seconds(time_string):
+    return sum(x * int(t) for x, t in zip([1, 60, 3600], reversed(time_string.split(":"))))
 
 
 @app.route('/categories', methods=['GET'])
@@ -74,19 +95,29 @@ def list_competition_date():
 
 
 def get_db():
-    if not hasattr(g, 'firebird_db'):
-        start = timer()
-        g.firebird_db = connect_db(app.config['DB_CONNECTION_STRING'],
-                                   app.config['DB_USERNAME'],
-                                   app.config['DB_PASSWORD'])
-        print('DB CONN {:.4f}ms'.format((timer()-start)*1000))
-    return g.firebird_db
+    start = timer()
+    db = getattr(g, 'firebird_db', None)
+    if db is None:
+        db = g.firebird_db = connect_db(app.config['DB_CONNECTION_STRING'],
+                                        app.config['DB_USERNAME'],
+                                        app.config['DB_PASSWORD'])
+    print('DB CONN {:.4f}ms'.format((timer() - start) * 1000))
+    return db
+
+
+def get_sqlite():
+    db = getattr(g, 'sqlite_db', None)
+    if db is None:
+        db = g.sqlite_db = sqlite3.connect(app.config['SQLITE'])
+    return db
 
 
 @app.teardown_appcontext
 def close_db(error):
     if hasattr(g, 'firebird_db'):
         g.firebird_db.close()
+    if hasattr(g, 'sqlite_db'):
+        g.sqlite_db.close()
 
 
 if __name__ == "__main__":
