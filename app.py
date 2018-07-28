@@ -47,6 +47,11 @@ def init_db():
 def punch():
     json = request.get_json()
     socketio.emit('new_punch', json)
+
+    json['stationCode'] = int(json['stationCode'])
+    if json['stationCode'] < 10: # below 10 is reserved as finish station
+        json['stationCode'] = 0
+
     sql = '''INSERT INTO punches(chipNumber, stationCode, time) VALUES (?,?,?)'''
     conn = get_sqlite()
     cur = conn.cursor()
