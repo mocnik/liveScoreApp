@@ -31,9 +31,9 @@ def test_punch(chip, station):
 @app.route('/punch', methods=['POST'])
 def punch():
     json = request.get_json()
-    runners = get_runner_by_chip_number(get_db(), json['chipNumber'])
-    if runners:
-        json['runner'] = runners[0]
+    # runners = get_runner_by_chip_number(get_db(), json['chipNumber'])
+    # if runners:
+    #     json['runner'] = runners[0]
     socketio.emit('new_punch', json)
     print(json)
     return '', 200
