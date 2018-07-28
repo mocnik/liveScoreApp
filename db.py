@@ -1,3 +1,5 @@
+from timeit import default_timer as timer
+
 import firebirdsql
 
 STR_ESCAPE = "'"
@@ -16,18 +18,20 @@ def connect_db(dsn, username, password):
     return firebirdsql.connect(dsn=dsn, user=username, password=password)
 
 
-def get_table(conn, table, filters=None):
+def get_table(conn, table, filters=None, order_by=None):
     """ Return `table` from `conn` and return it as dictionary. """
+    start = timer()
     cur = conn.cursor()
     sql = 'SELECT * FROM %s' % table
     if filters:
         sql += ' WHERE ' + ' AND '.join(str(k) + ' = ' + STR_ESCAPE + str(v) + STR_ESCAPE for k, v in filters.items())
-    print(sql)
+    if order_by:
+        sql += ' ORDER BY ' + order_by
     cur.execute(sql)
     data = cur.fetchall()
     desc = [description[0] for description in cur.description]
     cur.close()
-
+    print('{} {:.4f}ms'.format(sql, timer()-start))
     return [{d: e for e, d in zip(row, desc)} for row in data]
 
 
