@@ -76,7 +76,7 @@ def list_runner(start_number):
 
 @app.route('/category/<category_id>/runners', methods=['GET'])
 def list_category_runners(category_id):
-    return jsonify(get_category_runners(get_db(), category_id))
+    return jsonify(augment_runners(get_category_runners(get_db(), category_id)))
 
 
 @app.route('/category/<category_id>/startList', methods=['GET'])
@@ -92,6 +92,29 @@ def official_results_category(category_id):
 @app.route('/competition', methods=['GET'])
 def list_competition_date():
     return jsonify(get_competition_data(get_db()))
+
+
+def augment_runners(runners):
+    for runner in runners:
+        runner['punches'] = list_punches(runner['siCardNumber'], runner['startTime'])
+    return runners
+
+
+def list_punches(chip_number, start_time):
+    data = query_db('SELECT * FROM punches WHERE chipNumber = ?', (chip_number,))
+    return [punch_dict(d, start_time) for d in data]
+
+
+def punch_dict(d, start_time):
+    first_start = get_competition_data(get_db())['firstStart']
+    return {'chipNumber': d[0], 'stationCode': d[1], 'time': d[2] - first_start - start_time}
+
+
+def query_db(query, args=(), one=False):
+    cur = get_sqlite().execute(query, args)
+    rv = cur.fetchall()
+    cur.close()
+    return (rv[0] if rv else None) if one else rv
 
 
 def get_db():
