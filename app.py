@@ -72,7 +72,7 @@ def list_categories():
 
 @app.route('/runner/<start_number>', methods=['GET'])
 def list_runner(start_number):
-    runner_data = get_runner_by_start_number(get_db(), start_number)
+    runner_data = augment_runners(get_runner_by_start_number(get_db(), start_number))
     if not runner_data:
         abort(404)
 
