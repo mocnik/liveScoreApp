@@ -45,4 +45,6 @@ Body={"chipNumber": %ChipNr%, "time": "%PunchUnix%", "stationCode": %CodeNr%}
 * http://localhost:8000/category/CATEGORY/runners
 * http://localhost:8000/category/CATEGORY/startList
 * http://localhost:8000/category/CATEGORY/officialResults
+* http://localhost:8000/category/CATEGORY/results
+* http://localhost:8000/category/CATEGORY/results?station=60
 * http://localhost:8000/runner/START_NUMBER
