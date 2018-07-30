@@ -84,6 +84,26 @@ def list_category_runners(category_id):
     return jsonify(augment_runners(get_category_runners(get_db(), category_id)))
 
 
+@app.route('/category/<category_id>/results', methods=['GET'])
+def list_category_results(category_id):
+    if 'station' in request.args:
+        s = int(request.args['station'])
+    else:
+        s = 0
+
+    runners = sorted(
+        (runner for runner in augment_runners(get_category_runners(get_db(), category_id)) if s in runner['punches']),
+        key=lambda r: r['punches'][s]['time'])
+
+    return jsonify([extract_time(runner, s) for runner in runners])
+
+
+def extract_time(runner, s):
+    runner['competitionTime'] = runner['punches'][s]['time']
+    del runner['punches']
+    return runner
+
+
 @app.route('/category/<category_id>/startList', methods=['GET'])
 def startlist_category(category_id):
     return jsonify(get_category_startlist(get_db(), category_id))
@@ -107,12 +127,12 @@ def augment_runners(runners):
 
 def list_punches(chip_number, start_time):
     data = query_db('SELECT * FROM punches WHERE chipNumber = ?', (chip_number,))
-    return [punch_dict(d, start_time) for d in data]
+    return {d[1]: punch_dict(d, start_time) for d in data}
 
 
 def punch_dict(d, start_time):
     first_start = get_competition_data(get_db())['firstStart']
-    return {'chipNumber': d[0], 'stationCode': d[1], 'time': d[2] - first_start - start_time}
+    return {'chipNumber': d[0], 'time': d[2] - first_start - start_time}
 
 
 def query_db(query, args=(), one=False):
