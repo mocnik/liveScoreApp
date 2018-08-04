@@ -1,11 +1,11 @@
 from flask import Flask, g, request, jsonify, abort
 from flask_socketio import SocketIO
 from requests import post
-from time import time
+from time import time, sleep
 from timeit import default_timer as timer
 
 from db import connect_db, get_categories, get_category_runners, get_runner_by_start_number, get_competition_data, \
-    get_runner_by_chip_number, get_category_startlist, get_category_official_results, query_db
+    get_category_startlist, get_category_official_results, query_db
 from oevent2xml import to_xml, punch_xml
 
 import os
@@ -21,7 +21,8 @@ app.config.update(
     DB_CONNECTION_STRING='127.0.0.1:C:\\Users\\ASUS-Rok\\AppData\\Roaming\\OEvent\\Data\\Competition13.gdb',
     RESULT_FOLDER='C:\\Users\\ASUS-Rok\\liveScoreOut\\',
     SQLITE='punches.db',
-    XML_EXPORT=True
+    XML_EXPORT=True,
+    XML_EXPORT_WAIT=20
 )
 
 
@@ -39,12 +40,29 @@ def test_punch(chip, station, t):
     click.echo(data)
 
 
-@app.cli.command('xml', help='Generate IOF v3 xml')
+@app.cli.command('xml_one', help='Generate IOF v3 XML')
 def xml():
+    export_xml()
+
+
+def export_xml():
     results_file = os.path.join(app.config['RESULT_FOLDER'], "results.xml")
     with open(results_file, "wb") as f:
         f.write(to_xml(get_db(), get_sqlite()))
     print("Saved to: ", results_file)
+
+
+@app.cli.command('xml', help='Constantly generate IOF v3 XMLs')
+def xml_run():
+    while True:
+        try:
+            export_xml()
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception as exception:
+            print("Failed during update")
+        finally:
+            sleep(app.config['XML_EXPORT_WAIT'])
 
 
 @app.cli.command('init_db', help='Initialise database')
