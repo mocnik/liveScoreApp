@@ -6,8 +6,9 @@ from timeit import default_timer as timer
 
 from db import connect_db, get_categories, get_category_runners, get_runner_by_start_number, get_competition_data, \
     get_runner_by_chip_number, get_category_startlist, get_category_official_results
-from oevent2xml import to_xml
+from oevent2xml import to_xml, punch_xml
 
+import os
 import click
 import sqlite3
 
@@ -17,7 +18,8 @@ socketio = SocketIO(app)
 app.config.update(
     DB_USERNAME='SYSDBA',
     DB_PASSWORD='masterkey',
-    DB_CONNECTION_STRING='127.0.0.1:C:\\Users\\ASUS-Rok\\AppData\\Roaming\\OEvent\\Data\\Competition12.gdb',
+    DB_CONNECTION_STRING='127.0.0.1:C:\\Users\\ASUS-Rok\\AppData\\Roaming\\OEvent\\Data\\Competition13.gdb',
+    RESULT_FOLDER='C:\\Users\\ASUS-Rok\\liveScoreOut\\',
     SQLITE='punches.db'
 )
 
@@ -64,6 +66,10 @@ def punch():
     cur.execute(sql, (json['chipNumber'], json['stationCode'], json['time']))
     conn.commit()
     print(json)
+
+    filename = str(json['stationCode']) + "_" + str(json['chipNumber']) + ".xml"
+    with open(os.path.join(app.config['RESULT_FOLDER'], filename), "wb") as f:
+        f.write(punch_xml(get_db(), json['chipNumber'], json['stationCode'], json['time']))
     return '', 200
 
 

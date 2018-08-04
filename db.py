@@ -83,6 +83,10 @@ def get_runner_by_chip_number(conn, chip_number):
     return [to_runner_data(row) for row in table]
 
 
+def get_competitor_by_chip_number(conn, chip_number):
+    return get_table(conn, 'OEVLISTSVIEW', {'CHIPNUMBER1': chip_number})
+
+
 def to_runner_data(table_row):
     d = {'startNumber': table_row['STARTNUMBER'],
          'name': table_row['FIRSTNAME'] + ' ' + table_row['LASTNAME'],

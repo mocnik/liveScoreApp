@@ -7,7 +7,7 @@ import pyxb.utils.domutils
 
 from db import get_table, get_competitor_by_chip_number
 from iof import ResultStatus, ResultList, PersonResult, Person, PersonName, Namespace, \
-    PersonRaceResult, Organisation, ClassResult, Class, STD_ANON, DateAndOptionalTime, Event
+    PersonRaceResult, Organisation, ClassResult, Class, STD_ANON, DateAndOptionalTime, Event, SplitTime
 
 pyxb.utils.domutils.BindingDOMSupport.SetDefaultNamespace(Namespace)
 
@@ -36,13 +36,25 @@ def to_person_result(competitor, start_time):
         Given=competitor['FIRSTNAME'], Family=competitor['LASTNAME']))
     if competitor['CLUBLONGNAME']:
         x_result.Organisation = Organisation.Factory(
-            Name=competitor['CLUBLONGNAME'])
+            Name=competitor['CLUBLONGNAME'], ShortName=competitor['CLUBSHORTNAME'])
 
     x_person_result = PersonRaceResult()
     x_person_result.Status = STATUS_CODES[competitor['FINISHTYPE1']]
     x_person_result.StartTime = start.isoformat() + "+02:00"
     if competitor['COMPETITIONTIME1']:
         x_person_result.Time = competitor['COMPETITIONTIME1'] / 100
+
+    if 'SPLITTIME' in competitor:
+        station_code, punch_time = competitor['SPLITTIME']
+        punch = datetime.fromtimestamp(punch_time)
+        running_time = punch - start
+        if station_code <= 10:
+            if not competitor['COMPETITIONTIME1']:
+                x_person_result.Time = running_time.total_seconds()
+                x_person_result.Status = ResultStatus.OK
+        else:
+            split = SplitTime.Factory(ControlCode=str(station_code), Time=running_time.total_seconds())
+            x_person_result.SplitTime.append(split)
 
     x_result.Result.append(x_person_result)
     return x_result
@@ -111,3 +123,18 @@ def to_xml(conn):
 
     return x_result_list.toxml("utf-8")
 
+
+def punch_xml(conn, chip_number, station_code, time):
+    competitors = get_competitor_by_chip_number(conn, chip_number)
+    competition = get_table(conn, "OEVCOMPETITION")[0]
+
+    categories = defaultdict(list)
+
+    for competitor in competitors:
+        if (not competitor['ISVACANT']) and competitor['ISRUNNING1']:
+            competitor['SPLITTIME'] = (station_code, time)
+            categories[competitor['CATEGORYID']].append(competitor)
+
+    x_result_list = to_result_list(competition, categories)
+
+    return x_result_list.toxml("utf-8")
