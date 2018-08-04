@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 import pyxb.utils.domutils
 
-from db import get_table, get_competitor_by_chip_number
+from db import get_table, get_competitor_by_chip_number, query_db
 from iof import ResultStatus, ResultList, PersonResult, Person, PersonName, Namespace, \
     PersonRaceResult, Organisation, ClassResult, Class, STD_ANON, DateAndOptionalTime, Event, SplitTime
 
@@ -49,7 +49,7 @@ def to_person_result(competitor, start_time):
         punch = datetime.fromtimestamp(punch_time)
         running_time = punch - start
         if station_code <= 10:
-            if not competitor['COMPETITIONTIME1']:
+            if not competitor['COMPETITIONTIME1'] and not competitor['FINISHTYPE1']:
                 x_person_result.Time = running_time.total_seconds()
                 x_person_result.Status = ResultStatus.OK
         else:
@@ -103,20 +103,25 @@ def to_result_list(competition, categories):
     return x_result_list
 
 
-def to_xml(conn):
+def to_xml(conn_fb, conn_sql):
     """
     Connects to the db, retrieves competition data and generates IOF v3 ResultList xml
 
     Returns:
         str: results in IOF v3 xml format
     """
-    competition = get_table(conn, "OEVCOMPETITION")[0]
-    competitors = get_table(conn, "OEVLISTSVIEW")
+    competition = get_table(conn_fb, "OEVCOMPETITION")[0]
+    competitors = get_table(conn_fb, "OEVLISTSVIEW")
 
     categories = defaultdict(list)
 
+    punches = query_db(conn_sql, 'SELECT chipNumber, time FROM punches WHERE stationCode = 0')
+    punch_dict = {p[0]: p[1] for p in punches}
+
     for competitor in competitors:
         if (not competitor['ISVACANT']) and competitor['ISRUNNING1']:
+            if competitor['CHIPNUMBER1'] in punch_dict:
+                competitor['SPLITTIME'] = (0, punch_dict[competitor['CHIPNUMBER1']])
             categories[competitor['CATEGORYID']].append(competitor)
 
     x_result_list = to_result_list(competition, categories)

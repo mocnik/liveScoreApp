@@ -5,7 +5,7 @@ from time import time
 from timeit import default_timer as timer
 
 from db import connect_db, get_categories, get_category_runners, get_runner_by_start_number, get_competition_data, \
-    get_runner_by_chip_number, get_category_startlist, get_category_official_results
+    get_runner_by_chip_number, get_category_startlist, get_category_official_results, query_db
 from oevent2xml import to_xml, punch_xml
 
 import os
@@ -21,7 +21,7 @@ app.config.update(
     DB_CONNECTION_STRING='127.0.0.1:C:\\Users\\ASUS-Rok\\AppData\\Roaming\\OEvent\\Data\\Competition13.gdb',
     RESULT_FOLDER='C:\\Users\\ASUS-Rok\\liveScoreOut\\',
     SQLITE='punches.db',
-    XML_EXPORT=False
+    XML_EXPORT=True
 )
 
 
@@ -43,7 +43,7 @@ def test_punch(chip, station, t):
 def xml():
     results_file = os.path.join(app.config['RESULT_FOLDER'], "results.xml")
     with open(results_file, "wb") as f:
-        f.write(to_xml(get_db()))
+        f.write(to_xml(get_db(), get_sqlite()))
     print("Saved to: ", results_file)
 
 
@@ -143,20 +143,13 @@ def augment_runners(runners):
 
 
 def list_punches(chip_number, start_time):
-    data = query_db('SELECT * FROM punches WHERE chipNumber = ?', (chip_number,))
+    data = query_db(get_sqlite(), 'SELECT * FROM punches WHERE chipNumber = ?', (chip_number,))
     return {d[1]: punch_dict(d, start_time) for d in data}
 
 
 def punch_dict(d, start_time):
     first_start = get_competition_data(get_db())['firstStart']
     return {'chipNumber': d[0], 'time': d[2] - first_start - start_time}
-
-
-def query_db(query, args=(), one=False):
-    cur = get_sqlite().execute(query, args)
-    rv = cur.fetchall()
-    cur.close()
-    return (rv[0] if rv else None) if one else rv
 
 
 def get_db():
