@@ -20,7 +20,8 @@ app.config.update(
     DB_PASSWORD='masterkey',
     DB_CONNECTION_STRING='127.0.0.1:C:\\Users\\ASUS-Rok\\AppData\\Roaming\\OEvent\\Data\\Competition13.gdb',
     RESULT_FOLDER='C:\\Users\\ASUS-Rok\\liveScoreOut\\',
-    SQLITE='punches.db'
+    SQLITE='punches.db',
+    XML_EXPORT=False
 )
 
 
@@ -70,9 +71,10 @@ def punch():
     conn.commit()
     print(json)
 
-    filename = str(json['stationCode']) + "_" + str(json['chipNumber']) + ".xml"
-    with open(os.path.join(app.config['RESULT_FOLDER'], filename), "wb") as f:
-        f.write(punch_xml(get_db(), json['chipNumber'], json['stationCode'], json['time']))
+    if app.config['XML_EXPORT']:
+        filename = str(json['stationCode']) + "_" + str(json['chipNumber']) + ".xml"
+        with open(os.path.join(app.config['RESULT_FOLDER'], filename), "wb") as f:
+            f.write(punch_xml(get_db(), json['chipNumber'], json['stationCode'], json['time']))
     return '', 200
 
 
