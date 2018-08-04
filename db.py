@@ -40,17 +40,6 @@ def get_table(conn, table, filters=None, order_by=None):
     return [{d: e for e, d in zip(row, desc)} for row in data]
 
 
-def get_table_simple(conn, table):
-    """ Return `table` from `conn` and return it as named tuple. """
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM %s" % table)
-    data = cur.fetchall()
-    desc = [description[0] for description in cur.description]
-    cur.close()
-    table_class = namedtuple(table, desc)
-    return [table_class(*row) for row in data]
-
-
 def get_value(v):
     if isinstance(v, tuple):
         return str(v[1])
