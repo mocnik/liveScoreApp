@@ -38,6 +38,8 @@ Body={"chipNumber": %ChipNr%, "time": "%PunchUnix%", "stationCode": %CodeNr%}
     >flask punch 8210194 100
     >flask punch 550297 100
     ```
+ * IOF XML v3 export from OEvent `flask xml_one`
+ * Continuous XML export from OEvent `flask xml`
 
 ## Available endpoints
 * http://localhost:8000/competition
