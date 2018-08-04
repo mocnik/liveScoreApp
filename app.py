@@ -64,7 +64,7 @@ def punch():
     if json['stationCode'] < 10:  # below 10 is reserved as finish station
         json['stationCode'] = 0
 
-    sql = '''INSERT INTO punches(chipNumber, stationCode, time) VALUES (?,?,?)'''
+    sql = '''INSERT OR REPLACE INTO punches(chipNumber, stationCode, time) VALUES (?,?,?)'''
     conn = get_sqlite()
     cur = conn.cursor()
     cur.execute(sql, (json['chipNumber'], json['stationCode'], json['time']))
