@@ -4,3 +4,4 @@ eventlet
 firebirdsql
 requests
 click
+PyXB
