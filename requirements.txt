@@ -4,4 +4,4 @@ eventlet
 firebirdsql
 requests
 click
-PyXB
+PyXB==1.2.5

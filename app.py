@@ -6,6 +6,7 @@ from timeit import default_timer as timer
 
 from db import connect_db, get_categories, get_category_runners, get_runner_by_start_number, get_competition_data, \
     get_runner_by_chip_number, get_category_startlist, get_category_official_results
+from oevent2xml import to_xml
 
 import click
 import sqlite3
@@ -35,6 +36,11 @@ def test_punch(chip, station, t):
     click.echo(data)
 
 
+@app.cli.command('xml', help='Generate IOF v3 xml')
+def xml():
+    print(to_xml(get_db()))
+
+
 @app.cli.command('init_db', help='Initialise database')
 def init_db():
     db = get_sqlite()
@@ -49,7 +55,7 @@ def punch():
     socketio.emit('new_punch', json)
 
     json['stationCode'] = int(json['stationCode'])
-    if json['stationCode'] < 10: # below 10 is reserved as finish station
+    if json['stationCode'] < 10:  # below 10 is reserved as finish station
         json['stationCode'] = 0
 
     sql = '''INSERT INTO punches(chipNumber, stationCode, time) VALUES (?,?,?)'''
