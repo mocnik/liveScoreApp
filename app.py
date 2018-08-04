@@ -40,7 +40,10 @@ def test_punch(chip, station, t):
 
 @app.cli.command('xml', help='Generate IOF v3 xml')
 def xml():
-    print(to_xml(get_db()))
+    results_file = os.path.join(app.config['RESULT_FOLDER'], "results.xml")
+    with open(results_file, "wb") as f:
+        f.write(to_xml(get_db()))
+    print("Saved to: ", results_file)
 
 
 @app.cli.command('init_db', help='Initialise database')
