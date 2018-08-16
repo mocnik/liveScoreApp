@@ -22,7 +22,8 @@ app.config.update(
     RESULT_FOLDER='C:\\Users\\ASUS-Rok\\liveScoreOut\\',
     SQLITE='punches.db',
     XML_EXPORT=True,
-    XML_EXPORT_WAIT=20
+    XML_EXPORT_WAIT=20,
+    STAGE='1'
 )
 
 
@@ -48,7 +49,7 @@ def xml():
 def export_xml():
     results_file = os.path.join(app.config['RESULT_FOLDER'], "results.xml")
     with open(results_file, "wb") as f:
-        f.write(to_xml(get_db(), get_sqlite()))
+        f.write(to_xml(get_db(), get_sqlite(), app.config['STAGE']))
     print("Saved to: ", results_file)
 
 
@@ -92,7 +93,7 @@ def punch():
     if app.config['XML_EXPORT']:
         filename = str(json['stationCode']) + "_" + str(json['chipNumber']) + ".xml"
         with open(os.path.join(app.config['RESULT_FOLDER'], filename), "wb") as f:
-            f.write(punch_xml(get_db(), json['chipNumber'], json['stationCode'], json['time']))
+            f.write(punch_xml(get_db(), json['chipNumber'], json['stationCode'], json['time'], app.config['STAGE']))
     return '', 200
 
 
