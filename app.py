@@ -18,8 +18,8 @@ socketio = SocketIO(app)
 app.config.update(
     DB_USERNAME='SYSDBA',
     DB_PASSWORD='masterkey',
-    DB_CONNECTION_STRING='127.0.0.1:C:\\Users\\ASUS-Rok\\AppData\\Roaming\\OEvent\\Data\\Competition13.gdb',
-    RESULT_FOLDER='C:\\Users\\ASUS-Rok\\liveScoreOut\\',
+    DB_CONNECTION_STRING='192.168.1.143:C:\\Users\\ASUS-Rok\\AppData\\Roaming\\OEvent\\Data\\Competition13.gdb',
+    RESULT_FOLDER='C:\\Users\\rokmo\\liveScoreOut\\',
     SQLITE='punches.db',
     XML_EXPORT=True,
     XML_EXPORT_WAIT=20,
@@ -83,10 +83,10 @@ def punch():
     if json['stationCode'] < 10:  # below 10 is reserved as finish station
         json['stationCode'] = 0
 
-    sql = '''INSERT OR REPLACE INTO punches(chipNumber, stationCode, time) VALUES (?,?,?)'''
+    sql = '''INSERT OR REPLACE INTO punches(chipNumber, stationCode, time, stage) VALUES (?,?,?,?)'''
     conn = get_sqlite()
     cur = conn.cursor()
-    cur.execute(sql, (json['chipNumber'], json['stationCode'], json['time']))
+    cur.execute(sql, (json['chipNumber'], json['stationCode'], json['time'], app.config['stage']))
     conn.commit()
     print(json)
 
@@ -162,7 +162,7 @@ def augment_runners(runners):
 
 
 def list_punches(chip_number, start_time):
-    data = query_db(get_sqlite(), 'SELECT * FROM punches WHERE chipNumber = ?', (chip_number,))
+    data = query_db(get_sqlite(), 'SELECT * FROM punches WHERE chipNumber = ? AND stage = ?', (chip_number, app.config['STAGE']))
     return {d[1]: punch_dict(d, start_time) for d in data}
 
 
