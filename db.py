@@ -19,6 +19,14 @@ def connect_db(dsn, username, password):
     return firebirdsql.connect(dsn=dsn, user=username, password=password)
 
 
+def test_conn(conn):
+    cur = conn.cursor()
+    sql = "SELECT rdb$get_context('SYSTEM', 'ENGINE_VERSION') from rdb$database;"
+    cur.execute(sql)
+    data = cur.fetchall()
+    return data[0][0]
+
+
 def get_table(conn, table, filters=None, order_by=None):
     """ Return `table` from `conn` and return it as dictionary. """
     start = timer()

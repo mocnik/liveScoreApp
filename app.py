@@ -5,7 +5,7 @@ from time import time, sleep
 from timeit import default_timer as timer
 
 from db import connect_db, get_categories, get_category_runners, get_runner_by_start_number, get_competition_data, \
-    get_category_startlist, get_category_official_results, query_db
+    get_category_startlist, get_category_official_results, query_db, test_conn
 from oevent2xml import to_xml, punch_xml
 
 import os
@@ -51,6 +51,11 @@ def export_xml():
     with open(results_file, "wb") as f:
         f.write(to_xml(get_db(), get_sqlite(), app.config['STAGE']))
     print("Saved to: ", results_file)
+
+
+@app.cli.command('test_db', help='Test DB connection')
+def test_db():
+    print("Firebird DB version %s" % test_conn(get_db()))
 
 
 @app.cli.command('xml', help='Constantly generate IOF v3 XMLs')
