@@ -133,7 +133,7 @@ def to_xml(conn_fb, conn_sql, stage='1'):
 
 
 def punch_xml(conn, chip_number, station_code, time, stage='1'):
-    competitors = get_competitor_by_chip_number(conn, chip_number)
+    competitors = get_competitor_by_chip_number(conn, chip_number, stage)
     competition = get_table(conn, "OEVCOMPETITION")[0]
 
     categories = defaultdict(list)

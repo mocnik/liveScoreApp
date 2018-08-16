@@ -108,7 +108,7 @@ def list_categories():
 
 @app.route('/runner/<start_number>', methods=['GET'])
 def list_runner(start_number):
-    runner_data = augment_runners(get_runner_by_start_number(get_db(), start_number))
+    runner_data = augment_runners(get_runner_by_start_number(get_db(), start_number, app.config['STAGE']))
     if not runner_data:
         abort(404)
 
@@ -117,7 +117,7 @@ def list_runner(start_number):
 
 @app.route('/category/<category_id>/runners', methods=['GET'])
 def list_category_runners(category_id):
-    return jsonify(augment_runners(get_category_runners(get_db(), category_id)))
+    return jsonify(augment_runners(get_category_runners(get_db(), category_id, app.config['STAGE'])))
 
 
 @app.route('/category/<category_id>/results', methods=['GET'])
@@ -128,7 +128,7 @@ def list_category_results(category_id):
         s = 0
 
     runners = sorted(
-        (runner for runner in augment_runners(get_category_runners(get_db(), category_id)) if s in runner['punches']),
+        (runner for runner in augment_runners(get_category_runners(get_db(), category_id, app.config['STAGE'])) if s in runner['punches']),
         key=lambda r: r['punches'][s]['time'])
 
     return jsonify([extract_time(runner, s) for runner in runners])
@@ -142,17 +142,17 @@ def extract_time(runner, s):
 
 @app.route('/category/<category_id>/startList', methods=['GET'])
 def startlist_category(category_id):
-    return jsonify(get_category_startlist(get_db(), category_id))
+    return jsonify(get_category_startlist(get_db(), category_id, app.config['STAGE']))
 
 
 @app.route('/category/<category_id>/officialResults', methods=['GET'])
 def official_results_category(category_id):
-    return jsonify(get_category_official_results(get_db(), category_id))
+    return jsonify(get_category_official_results(get_db(), category_id, app.config['STAGE']))
 
 
 @app.route('/competition', methods=['GET'])
 def list_competition_date():
-    return jsonify(get_competition_data(get_db()))
+    return jsonify(get_competition_data(get_db(), app.config['STAGE']))
 
 
 def augment_runners(runners):
@@ -167,7 +167,7 @@ def list_punches(chip_number, start_time):
 
 
 def punch_dict(d, start_time):
-    first_start = get_competition_data(get_db())['firstStart']
+    first_start = get_competition_data(get_db(), app.config['STAGE'])['firstStart']
     return {'chipNumber': d[0], 'time': d[2] - first_start - start_time}
 
 
