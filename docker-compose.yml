@@ -1,0 +1,10 @@
+version: '3'
+services:
+  firebird:
+    image: jacobalberty/firebird:2.5.8-sc
+    environment:
+      - ISC_PASSWORD=masterkey
+    volumes:
+      - C:\Users\rokmo\AppData\Roaming\OEvent\Data\:/firebird/data
+    ports:
+      - 3050:3050
