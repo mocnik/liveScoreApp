@@ -118,7 +118,7 @@ def to_xml(conn_fb, conn_sql, stage='1'):
 
     categories = defaultdict(list)
 
-    punches = query_db(conn_sql, 'SELECT chipNumber, time FROM punches WHERE stationCode = 0')
+    punches = query_db(conn_sql, 'SELECT chipNumber, time FROM punches WHERE stationCode = 0 AND stage = ?', (stage,))
     punch_dict = {p[0]: p[1] for p in punches}
 
     for competitor in competitors:
