@@ -1,5 +1,6 @@
 from flask import Flask, g, request, jsonify, abort
 from flask_socketio import SocketIO
+from flask_cors import CORS
 from requests import post
 from time import time, sleep
 from timeit import default_timer as timer
@@ -13,6 +14,7 @@ import click
 import sqlite3
 
 app = Flask(__name__)
+CORS(app)
 socketio = SocketIO(app)
 
 app.config.update(

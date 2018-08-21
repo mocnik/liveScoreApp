@@ -5,3 +5,4 @@ firebirdsql
 requests
 click
 PyXB==1.2.5
+flask-cors
