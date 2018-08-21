@@ -14,7 +14,7 @@ Change WebClient settings at the bottom of `jSh_Radio.ini` with:
 ```
 URL=http://127.0.0.1:8000/punch
 Header=Content-Type: application/json
-Body={"chipNumber": %ChipNr%, "time": "%PunchUnix%", "stationCode": %CodeNr%}
+Body={"chipNumber": %ChipNr%, "time": %PunchUnix%, "stationCode": %CodeNr%}
 ```
 
 ## OEvent
