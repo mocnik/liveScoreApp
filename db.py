@@ -66,7 +66,7 @@ def get_categories(conn):
 
 
 def get_category_runners(conn, category_id, stage):
-    table = get_table(conn, 'OEVLISTSVIEW', {'CATEGORYNAME': category_id})
+    table = get_table(conn, 'OEVLISTSVIEW', {'CATEGORYNAME': category_id, 'ISRUNNING' + stage: 1})
     return [to_runner_data(row, stage) for row in table]
 
 
@@ -83,7 +83,7 @@ def get_category_official_results(conn, category_id, stage):
 
 
 def get_runner_by_start_number(conn, start_number,stage):
-    table = get_table(conn, 'OEVLISTSVIEW', {'STARTNUMBER': start_number})
+    table = get_table(conn, 'OEVLISTSVIEW', {'STARTNUMBER': start_number, 'ISRUNNING' + stage: 1})
     return [to_runner_data(row, stage) for row in table]
 
 
