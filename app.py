@@ -93,7 +93,7 @@ def punch():
     sql = '''INSERT OR REPLACE INTO punches(chipNumber, stationCode, time, stage) VALUES (?,?,?,?)'''
     conn = get_sqlite()
     cur = conn.cursor()
-    cur.execute(sql, (json['chipNumber'], json['stationCode'], json['time'], app.config['stage']))
+    cur.execute(sql, (json['chipNumber'], json['stationCode'], json['time'], app.config['STAGE']))
     conn.commit()
     print(json)
 
