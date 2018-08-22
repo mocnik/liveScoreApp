@@ -122,7 +122,7 @@ def to_xml(conn_fb, conn_sql, stage='1'):
     punch_dict = {p[0]: p[1] for p in punches}
 
     for competitor in competitors:
-        if (not competitor['ISVACANT']) and competitor['ISRUNNING' + stage]:
+        if (not competitor['ISVACANT']) and competitor['ISRUNNING' + stage] and competitor['STARTTIME' + stage]:
             if competitor['CHIPNUMBER' + stage] in punch_dict:
                 competitor['SPLITTIME'] = (0, punch_dict[competitor['CHIPNUMBER' + stage]])
             categories[competitor['CATEGORYID']].append(competitor)
