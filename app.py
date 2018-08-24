@@ -2,16 +2,17 @@ from flask import Flask, g, request, jsonify, abort
 from flask_socketio import SocketIO
 from flask_cors import CORS
 from requests import post
-from time import time, sleep
 from timeit import default_timer as timer
 
 from db import connect_db, get_categories, get_category_runners, get_runner_by_start_number, get_competition_data, \
-    get_category_startlist, get_category_official_results, query_db, test_conn
+    get_category_startlist, get_category_official_results, query_db, test_conn, STATUS_CODE_SORT
 from oevent2xml import to_xml, punch_xml
 
 import os
+import time
 import click
 import sqlite3
+import datetime
 
 app = Flask(__name__)
 CORS(app)
@@ -37,7 +38,7 @@ def test_punch(chip, station, t):
     if t:
         punch_time = int(t)
     else:
-        punch_time = int(round(time()))
+        punch_time = int(round(time.time()))
     data = {'chipNumber': chip, 'time': punch_time, 'stationCode': station}
     post('http://127.0.0.1:8000/punch', json=data)
     click.echo(data)
@@ -70,7 +71,7 @@ def xml_run():
         except Exception as exception:
             print("Failed during update")
         finally:
-            sleep(app.config['XML_EXPORT_WAIT'])
+            time.sleep(app.config['XML_EXPORT_WAIT'])
 
 
 @app.cli.command('init_db', help='Initialise database')
@@ -136,9 +137,13 @@ def list_category_results(category_id):
 
     runners = sorted(
         (runner for runner in augment_runners(get_category_runners(get_db(), category_id, app.config['STAGE'])) if s in runner['punches']),
-        key=lambda r: r['punches'][s]['time'])
-
+        # key=lambda r: r['punches'][s]['time'])
+        key=lambda r: sort_results(r, s))
     return jsonify([extract_time(runner, s) for runner in runners])
+
+
+def sort_results(r, s):
+    return STATUS_CODE_SORT[r['finishType']], r['punches'][s]['time']
 
 
 def extract_time(runner, s):
@@ -174,8 +179,10 @@ def list_punches(chip_number, start_time):
 
 
 def punch_dict(d, start_time):
+    midnight = datetime.datetime.combine(datetime.datetime.today(), datetime.time.min)
+    midnight_unix = time.mktime(midnight.timetuple())
     first_start = get_competition_data(get_db(), app.config['STAGE'])['firstStart']
-    return {'chipNumber': d[0], 'time': d[2] - first_start - start_time}
+    return {'chipNumber': d[0], 'time': d[3] - first_start - start_time - midnight_unix}
 
 
 def get_db():

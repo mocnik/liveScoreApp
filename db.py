@@ -13,6 +13,15 @@ STATUS_CODES = {
     5: 'MP'
 }
 
+STATUS_CODE_SORT = {
+    'Active': 0,
+    'OK': 0,
+    'DISQ': 1,
+    'DNF': 1,
+    'DNS': 1,
+    'MP': 1
+}
+
 
 def connect_db(dsn, username, password):
     """Connects to the specific database."""
