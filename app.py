@@ -49,6 +49,14 @@ def xml():
     export_xml()
 
 
+@app.cli.command('xml_official', help='Generate IOF v3 XML Official Results')
+def xml():
+    results_file = os.path.join(app.config['RESULT_FOLDER'], "official_results.xml")
+    with open(results_file, "wb") as f:
+        f.write(to_xml(get_db(), get_sqlite(), app.config['STAGE'], official=True))
+    print("Saved to: ", results_file)
+
+
 def export_xml():
     results_file = os.path.join(app.config['RESULT_FOLDER'], "results.xml")
     with open(results_file, "wb") as f:
