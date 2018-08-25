@@ -91,8 +91,17 @@ def punch():
     if json['stationCode'] < 10:  # below 10 is reserved as finish station
         json['stationCode'] = 0
 
-    sql = '''INSERT OR REPLACE INTO punches(chipNumber, stationCode, time, stage) VALUES (?,?,?,?)'''
     conn = get_sqlite()
+    cur = conn.cursor()
+    sql = '''SELECT count(*) FROM punches WHERE chipNumber = ? AND stationCode = ? AND stage = ?'''
+    cur.execute(sql, (json['chipNumber'], json['stationCode'], app.config['STAGE']))
+    count_punches = cur.fetchall()
+
+    if count_punches[0][0]:
+        json['stationCode'] = int(json['stationCode']) + 1000
+
+    sql = '''INSERT OR REPLACE INTO punches(chipNumber, stationCode, time, stage) VALUES (?,?,?,?)'''
+
     cur = conn.cursor()
     cur.execute(sql, (json['chipNumber'], json['stationCode'], json['time'], app.config['STAGE']))
     conn.commit()
@@ -181,7 +190,8 @@ def list_punches(chip_number, start_time):
 def punch_dict(d, start_time):
     midnight = datetime.datetime.combine(datetime.datetime.today(), datetime.time.min)
     midnight_unix = time.mktime(midnight.timetuple())
-    first_start = get_competition_data(get_db(), app.config['STAGE'])['firstStart']
+    # first_start = get_competition_data(get_db(), app.config['STAGE'])['firstStart'] TEMP fix for sprint
+    first_start = 41400
     return {'chipNumber': d[0], 'time': d[3] - first_start - start_time - midnight_unix}
 
 
